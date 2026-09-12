@@ -1,5 +1,6 @@
 # BharatBot
-Indigenous Modular Autonomous Servicing Robot for Future Lunar &amp; Martian Habitats
+Indigenous Modular Autonomous Servicing Robot for Future Lunar and Martian Habitats
+
 Team: The Vanguard
 
 🌙 Overview
