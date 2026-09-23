@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- LIDAR sensor macro for nova_bot -->
+    <xacro:macro name="lidar_sensor" params="prefix parent_link *origin">
+        
+        <!-- LIDAR Link -->
+        <link name="${prefix}_lidar_link">
+            <!-- Visual - Your Blender model -->
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://bharatbot_description/meshes/visual/ydlidar_x2_assy.dae" 
+                          scale="1.0 1.0 1.0"/>
+                </geometry>
+            </visual>
+            
+            <!-- Collision - Your optimized STL -->
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://nova_bot_description/meshes/collision/ydlidar_x2_assy.stl" 
+                          scale="1.0 1.0 1.0"/>
+                </geometry>
+            </collision>
+            
+            <!-- Inertial - light sensor -->
+            <inertial>
+                <mass value="0.125"/>  <!-- 125 grams -->
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <inertia ixx="1e-5" ixy="0" ixz="0" 
+                         iyy="1e-5" iyz="0" 
+                         izz="1e-5"/>
+            </inertial>
+        </link>
+        
+        <!-- LIDAR Joint -->
+        <joint name="${prefix}_lidar_joint" type="fixed">
+            <parent link="${parent_link}"/>
+            <child link="${prefix}_lidar_link"/>
+            <xacro:insert_block name="origin"/>
+        </joint>
+        
+    </xacro:macro>
+
+</robot>

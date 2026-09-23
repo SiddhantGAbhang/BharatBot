@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- IMU sensor macro with optimized settings for your Blender model -->
+    <xacro:macro name="imu_sensor" params="prefix parent_link *origin">
+        
+        <!-- IMU Link -->
+        <link name="${prefix}_imu_link">
+            <!-- Visual - Your cool Blender model with original colors -->
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://bharatbot_description/meshes/visual/imu.dae" 
+                          scale="1.0 1.0 1.0"/>
+                </geometry>
+                <!-- No material tag - uses your model's built-in colors -->
+            </visual>
+            
+            <!-- Collision - Your optimized STL -->
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://bharatbot_description/meshes/collision/imu.stl" 
+                          scale="1.0 1.0 1.0"/>
+                </geometry>
+            </collision>
+            
+            <!-- Inertial - Very light to avoid Gazebo issues -->
+            <inertial>
+                <mass value="0.005"/>  <!-- 5 grams - realistic IMU weight -->
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <inertia ixx="5e-7" ixy="0" ixz="0" 
+                         iyy="5e-7" iyz="0" 
+                         izz="5e-7"/>
+            </inertial>
+        </link>
+        
+        <!-- IMU Joint -->
+        <joint name="${prefix}_imu_joint" type="fixed">
+            <parent link="${parent_link}"/>
+            <child link="${prefix}_imu_link"/>
+            <xacro:insert_block name="origin"/>
+        </joint>
+        
+    </xacro:macro>
+
+</robot>

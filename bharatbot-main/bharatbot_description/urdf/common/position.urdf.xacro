@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- IMU Positioning Options -->
+    <!-- Easy configuration for different mounting positions -->
+
+    <xacro:property name="imu_x" value="0.0"/>      <!-- Forward/Back: 0 = centered -->
+    <xacro:property name="imu_y" value="0.0"/>    <!-- Left/Right: 0 = centered -->
+    <xacro:property name="imu_z" value="0.0278"/>     <!-- Up/Down: 0.0278 = 2.78cm above base_link -->
+    <xacro:property name="imu_roll" value="0"/>
+    <xacro:property name="imu_pitch" value="0"/>
+    <xacro:property name="imu_yaw" value="0"/>
+    
+    <!-- IMU Origin Macro -->
+    <xacro:macro name="imu_origin">
+        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="${imu_roll} ${imu_pitch} ${imu_yaw}"/>
+    </xacro:macro>
+
+    <!-- Camera Positioning Options -->
+    <!-- Easy configuration for different mounting positions -->
+
+    <xacro:property name="camera_x" value="-0.05"/>    <!-- Forward: 5cm in front of base_link -->
+    <xacro:property name="camera_y" value="0.0"/>     <!-- Left/Right: 0 = centered -->
+    <xacro:property name="camera_z" value="-0.021"/>    <!-- Up/Down: 2.1cm below base_link -->
+    <xacro:property name="camera_roll" value="0"/>
+    <xacro:property name="camera_pitch" value="0"/>
+    <xacro:property name="camera_yaw" value="355"/>
+    
+    <!-- Camera Origin Macro -->
+    <xacro:macro name="camera_origin">
+        <origin xyz="${camera_x} ${camera_y} ${camera_z}" rpy="${camera_roll} ${camera_pitch} ${camera_yaw}"/>
+    </xacro:macro>
+
+    <!-- LIDAR Positioning Options -->
+    <!-- Easy configuration for different mounting positions -->
+
+    <xacro:property name="lidar_x" value="-0.05"/>      <!-- Forward: 5cm in front of base_link -->
+    <xacro:property name="lidar_y" value="0.0"/>      <!-- Left/Right: 0 = centered -->
+    <xacro:property name="lidar_z" value="0.0278"/>     <!-- Up/Down: 2.78cm above base_link -->
+    <xacro:property name="lidar_roll" value="0"/>
+    <xacro:property name="lidar_pitch" value="0"/>
+    <xacro:property name="lidar_yaw" value="0"/>
+    
+    <!-- LIDAR Origin Macro -->
+    <xacro:macro name="lidar_origin">
+        <origin xyz="${lidar_x} ${lidar_y} ${lidar_z}" rpy="${lidar_roll} ${lidar_pitch} ${lidar_yaw}"/>
+    </xacro:macro>
+
+</robot>

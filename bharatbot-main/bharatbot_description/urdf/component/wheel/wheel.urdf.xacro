@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Wheel macro -->
+    <xacro:macro name="wheel" params="prefix side reflect">
+        <link name="${prefix}_wheel">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 ${reflect * pi/2}"/>
+                <geometry>
+                    <mesh filename="package://bharatbot_description/meshes/visual/wheel.dae" scale="1 1 1"/>
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 ${reflect * pi/2}"/>
+                <geometry>
+                    <mesh filename="package://bharatbot_description/meshes/collision/wheel.stl" scale="1 1 1"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <mass value="${wheel_mass}"/>
+                <xacro:cylinder_inertia m="${wheel_mass}" r="${wheel_diameter/2}" h="0.025"/>
+            </inertial>
+        </link>
+
+        <joint name="${prefix}_wheel_joint" type="continuous">
+            <parent link="base_link"/>
+            <child link="${prefix}_wheel"/>
+            <axis xyz="0 -1 0"/>
+            <origin xyz="0 ${reflect * wheel_separation/2} 0" rpy="0 0 0"/>
+        </joint>
+    </xacro:macro>
+
+</robot>

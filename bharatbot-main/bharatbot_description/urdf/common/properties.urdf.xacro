@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Essential robot properties -->
+    <xacro:property name="wheel_diameter" value="0.068"/>
+    <xacro:property name="wheel_separation" value="0.180"/>
+    <xacro:property name="wheel_mass" value="0.200"/>
+    <xacro:property name="base_mass" value="2.0"/>
+
+</robot>

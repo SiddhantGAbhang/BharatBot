@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Camera sensor macro for bharatbot -->
+    <xacro:macro name="camera_sensor" params="prefix parent_link *origin">
+        
+        <!-- Camera Link (physical link) -->
+        <link name="${prefix}_camera_link">
+            <!-- Visual - Your Blender model with original colors -->
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://bharatbot_description/meshes/visual/camera.dae" 
+                          scale="1.0 1.0 1.0"/>
+                </geometry>
+                <!-- No material tag - uses your model's built-in colors -->
+            </visual>
+            
+            <!-- Collision - Your optimized STL -->
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://bharatbot_description/meshes/collision/camera.stl" 
+                          scale="1.0 1.0 1.0"/>
+                </geometry>
+            </collision>
+            
+            <!-- Inertial - very light camera -->
+            <inertial>
+                <mass value="0.01"/>  <!-- 10 grams -->
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <inertia ixx="1e-6" ixy="0" ixz="0" 
+                         iyy="1e-6" iyz="0" 
+                         izz="1e-6"/>
+            </inertial>
+        </link>
+        
+        <!-- Camera Joint -->
+        <joint name="${prefix}_camera_joint" type="fixed">
+            <parent link="${parent_link}"/>
+            <child link="${prefix}_camera_link"/>
+            <xacro:insert_block name="origin"/>
+        </joint>
+        
+        <!-- Camera Optical Link (for ROS convention) -->
+        <!-- This transforms from ROS convention (X-forward, Y-left, Z-up) -->
+        <!-- to camera/optical convention (X-right, Y-down, Z-forward) -->
+        <joint name="${prefix}_camera_optical_joint" type="fixed">
+            <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+            <parent link="${prefix}_camera_link"/>
+            <child link="${prefix}_camera_link_optical"/>
+        </joint>
+        
+        <link name="${prefix}_camera_link_optical">
+            <!-- Empty link, just for coordinate frame transformation -->
+        </link>
+        
+    </xacro:macro>
+
+</robot>

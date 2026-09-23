@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<robot name="bharatbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Include common files -->
+    <xacro:include filename="$(find bharatbot_description)/urdf/common/properties.urdf.xacro"/>
+    <xacro:include filename="$(find bharatbot_description)/urdf/common/inertia_macro.urdf.xacro"/>
+    <xacro:include filename="$(find bharatbot_description)/urdf/common/position.urdf.xacro"/>
+
+    <!-- Include component files -->
+    <xacro:include filename="$(find bharatbot_description)/urdf/component/base/base.urdf.xacro"/>
+    <xacro:include filename="$(find bharatbot_description)/urdf/component/wheel/wheel.urdf.xacro"/>
+    <xacro:include filename="$(find bharatbot_description)/urdf/component/imu/imu.urdf.xacro"/>
+    <xacro:include filename="$(find bharatbot_description)/urdf/component/camera/camera.urdf.xacro"/>
+    <xacro:include filename="$(find bharatbot_description)/urdf/component/lidar/lidar.urdf.xacro"/>
+
+    <!-- Include Gazebo-specific components -->
+    <xacro:include filename="$(find bharatbot_description)/urdf/bharatbot.gazebo.xacro"/>
+
+    <!-- Instantiate robot components -->
+    <xacro:base_link parent="base_footprint"/>
+    <xacro:wheel prefix="left" side="left" reflect="1"/>
+    <xacro:wheel prefix="right" side="right" reflect="-1"/>
+    
+    <!-- Add IMU sensor with configurable position -->
+    <xacro:imu_sensor prefix="bharatbot" parent_link="base_link">
+        <xacro:imu_origin/>
+    </xacro:imu_sensor>
+
+    <!-- Add Camera sensor with configurable position -->
+    <xacro:camera_sensor prefix="bharatbot" parent_link="base_link">
+        <xacro:camera_origin/>
+    </xacro:camera_sensor>
+
+    <!-- Add LIDAR sensor with configurable position -->
+    <xacro:lidar_sensor prefix="bharatbot" parent_link="base_link">
+        <xacro:lidar_origin/>
+    </xacro:lidar_sensor>
+
+</robot>

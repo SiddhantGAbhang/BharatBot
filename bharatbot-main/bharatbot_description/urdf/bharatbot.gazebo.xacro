@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Include component Gazebo files -->
+  <xacro:include filename="$(find nova_bot_description)/urdf/component/base/base.gazebo.xacro"/>
+  <xacro:include filename="$(find nova_bot_description)/urdf/component/wheel/wheel.gazebo.xacro"/>
+  <xacro:include filename="$(find nova_bot_description)/urdf/component/camera/camera.gazebo.xacro"/>
+  <xacro:include filename="$(find nova_bot_description)/urdf/component/lidar/lidar.gazebo.xacro"/>
+  <xacro:include filename="$(find nova_bot_description)/urdf/component/imu/imu.gazebo.xacro"/>
+
+  <!-- Call IMU Gazebo plugin -->
+  <xacro:imu_gazebo prefix="nova"/>
+
+</robot>
