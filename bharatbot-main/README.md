@@ -1,4 +1,4 @@
-# Nova-Bot Autonomous Navigation Robot
+# BharatBot Autonomous Navigation Robot
 
 <p align="center">
   <img src="media/gazebo.png" alt="BharatBot in Gazebo" width="45%">
