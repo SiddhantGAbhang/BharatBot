@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BharatBot - Autonomous Servicing robot for lunar and martian habitats</title>
+  <meta name="description"
+    content="BharatBot - Autonomous Servicing robot for lunar and martian habitats — real-time telemetry, navigation status, and sensor dashboard." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- roslibjs – browser WebSocket client for rosbridge_suite -->
+  <script src="https://cdn.jsdelivr.net/npm/roslib@1/build/roslib.min.js"></script>
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════ LAUNCH SCREEN -->
+  <div id="launch-screen">
+    <canvas id="star-canvas"></canvas>
+    <div id="moon-landing-anim">
+      <div id="moon-surface-wrap">
+        <div id="moon-ground"></div>
+        <div id="moon-craters">
+          <div class="crater c1"></div>
+          <div class="crater c2"></div>
+          <div class="crater c3"></div>
+          <div class="crater c4"></div>
+          <div class="crater c5"></div>
+        </div>
+        <div id="dust-left"></div>
+        <div id="dust-right"></div>
+      </div>
+      <div id="lander">
+        <div class="lander-body">
+          <div class="lander-top"></div>
+          <div class="lander-mid"></div>
+          <div class="lander-leg left"></div>
+          <div class="lander-leg right"></div>
+          <div class="thruster-glow"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="launch-overlay">
+      <div id="bharatbot-logo-launch">
+        <span>B</span><span>H</span><span>A</span><span>R</span><span>A</span><span>T</span><span>B</span><span>O</span><span>T</span>
+      </div>
+      <p id="launch-tagline">BharatBot - Autonomous Servicing robot for lunar and martian habitats · Mission Control</p>
+      <div id="launch-progress-bar-wrap">
+        <div id="launch-progress-bar"></div>
+      </div>
+      <p id="launch-status-text">Initializing systems…</p>
+      <button id="skip-btn">Skip Intro ↗</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ MAIN DASHBOARD -->
+  <div id="dashboard" class="hidden">
+
+    <!-- NAV -->
+    <nav id="navbar">
+      <div id="nav-logo">
+        <svg id="nav-icon" viewBox="0 0 40 40">
+          <circle cx="20" cy="20" r="18" stroke="#00e5ff" stroke-width="2" fill="none" />
+          <circle cx="20" cy="20" r="5" fill="#00e5ff" />
+          <line x1="20" y1="2" x2="20" y2="10" stroke="#00e5ff" stroke-width="2" />
+          <line x1="20" y1="30" x2="20" y2="38" stroke="#00e5ff" stroke-width="2" />
+          <line x1="2" y1="20" x2="10" y2="20" stroke="#00e5ff" stroke-width="2" />
+          <line x1="30" y1="20" x2="38" y2="20" stroke="#00e5ff" stroke-width="2" />
+        </svg>
+        <span>BHARATBOT</span>
+      </div>
+      <ul id="nav-links">
+        <li><a href="#hero" class="nav-link active">Home</a></li>
+        <li><a href="#telemetry" class="nav-link">Telemetry</a></li>
+        <li><a href="#sensors" class="nav-link">Sensors</a></li>
+        <li><a href="#navigation" class="nav-link">Navigation</a></li>
+        <li><a href="#systems" class="nav-link">Systems</a></li>
+      </ul>
+      <!-- ROSBridge Connection Panel -->
+      <div id="ros-connect-panel">
+        <input id="ros-url-input" type="text" value="ws://localhost:9090" placeholder="ws://localhost:9090"
+          spellcheck="false" autocomplete="off" />
+        <button id="ros-connect-btn">Connect</button>
+      </div>
+      <div id="nav-status">
+        <span class="status-dot sim" id="conn-dot"></span>
+        <span id="conn-label">SIMULATION</span>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero">
+      <canvas id="hero-canvas"></canvas>
+      <div id="hero-moon-horizon">
+        <div id="hero-moon-ground">
+          <div class="hero-crater hc1"></div>
+          <div class="hero-crater hc2"></div>
+          <div class="hero-crater hc3"></div>
+          <div class="hero-rover" id="hero-rover">
+            <div class="rover-body">
+              <div class="rover-panel"></div>
+              <div class="rover-sensor"></div>
+            </div>
+            <div class="rover-wheel w1"></div>
+            <div class="rover-wheel w2"></div>
+            <div class="rover-wheel w3"></div>
+            <div class="rover-wheel w4"></div>
+            <div class="rover-antenna"></div>
+          </div>
+        </div>
+      </div>
+      <div id="hero-content">
+        <div id="hero-badge">BHARATBOT MISSION 2026</div>
+        <h1 id="hero-title">BHARATBOT<br /><span>Autonomous Servicing Robot for Lunar & Martian Habitats</span></h1>
+        <p id="hero-desc">Real-time mission telemetry, sensor fusion data, and autonomous navigation monitoring for BharatBot - Autonomous Servicing robot for lunar and martian habitats.</p>
+        <div id="hero-btns">
+          <a href="#telemetry" class="btn-primary" id="hero-telemetry-btn">View Telemetry</a>
+          <a href="#systems" class="btn-ghost">System Status</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TELEMETRY KPIs ── -->
+    <section id="telemetry">
+      <div class="section-header">
+        <div class="section-badge">LIVE FEED</div>
+        <h2>Telemetry Dashboard</h2>
+        <p>Real-time data streams from BharatBot hardware interface via ROS2 topics</p>
+      </div>
+      <div id="kpi-grid">
+        <div class="kpi-card" id="kpi-battery">
+          <div class="kpi-icon">⚡</div>
+          <div class="kpi-label">Battery Level</div>
+          <div class="kpi-value" id="val-battery">--</div>
+          <div class="kpi-unit">%</div>
+          <div class="kpi-bar-wrap">
+            <div class="kpi-bar" id="bar-battery"></div>
+          </div>
+        </div>
+        <div class="kpi-card" id="kpi-speed">
+          <div class="kpi-icon">🚀</div>
+          <div class="kpi-label">Linear Speed</div>
+          <div class="kpi-value" id="val-speed">--</div>
+          <div class="kpi-unit">m/s</div>
+          <div class="kpi-bar-wrap">
+            <div class="kpi-bar" id="bar-speed"></div>
+          </div>
+        </div>
+        <div class="kpi-card" id="kpi-angular">
+          <div class="kpi-icon">🔄</div>
+          <div class="kpi-label">Angular Velocity</div>
+          <div class="kpi-value" id="val-angular">--</div>
+          <div class="kpi-unit">rad/s</div>
+          <div class="kpi-bar-wrap">
+            <div class="kpi-bar" id="bar-angular"></div>
+          </div>
+        </div>
+        <div class="kpi-card" id="kpi-temp">
+          <div class="kpi-icon">🌡</div>
+          <div class="kpi-label">System Temp</div>
+          <div class="kpi-value" id="val-temp">--</div>
+          <div class="kpi-unit">°C</div>
+          <div class="kpi-bar-wrap">
+            <div class="kpi-bar" id="bar-temp"></div>
+          </div>
+        </div>
+        <div class="kpi-card" id="kpi-uptime">
+          <div class="kpi-icon">⏱</div>
+          <div class="kpi-label">Mission Uptime</div>
+          <div class="kpi-value" id="val-uptime">00:00:00</div>
+          <div class="kpi-unit">HH:MM:SS</div>
+        </div>
+        <div class="kpi-card" id="kpi-distance">
+          <div class="kpi-icon">📍</div>
+          <div class="kpi-label">Distance Covered</div>
+          <div class="kpi-value" id="val-distance">--</div>
+          <div class="kpi-unit">m</div>
+          <div class="kpi-bar-wrap">
+            <div class="kpi-bar" id="bar-distance"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SENSORS ── -->
+    <section id="sensors">
+      <div class="section-header">
+        <div class="section-badge">SENSOR ARRAY</div>
+        <h2>Sensor Data</h2>
+        <p>Fused IMU, LiDAR, and environment readings from <code>/imu</code> and <code>/scan</code> topics</p>
+      </div>
+      <div id="sensors-grid">
+
+        <!-- IMU Panel -->
+        <div class="sensor-card" id="imu-card">
+          <h3>🧭 IMU / Orientation</h3>
+          <div class="sensor-3d-wrap">
+            <canvas id="imu-canvas" width="260" height="160"></canvas>
+          </div>
+          <div class="sensor-rows">
+            <div class="sensor-row"><span>Roll</span><span id="imu-roll" class="sensor-val">--</span><span
+                class="sensor-unit">°</span></div>
+            <div class="sensor-row"><span>Pitch</span><span id="imu-pitch" class="sensor-val">--</span><span
+                class="sensor-unit">°</span></div>
+            <div class="sensor-row"><span>Yaw</span><span id="imu-yaw" class="sensor-val">--</span><span
+                class="sensor-unit">°</span></div>
+            <div class="sensor-row"><span>Accel X</span><span id="imu-ax" class="sensor-val">--</span><span
+                class="sensor-unit">m/s²</span></div>
+            <div class="sensor-row"><span>Accel Y</span><span id="imu-ay" class="sensor-val">--</span><span
+                class="sensor-unit">m/s²</span></div>
+          </div>
+        </div>
+
+        <!-- LiDAR Panel -->
+        <div class="sensor-card" id="lidar-card">
+          <h3>📡 LiDAR Scan</h3>
+          <canvas id="lidar-canvas" width="300" height="240"></canvas>
+          <div class="sensor-rows">
+            <div class="sensor-row"><span>Min Range</span><span id="lidar-min" class="sensor-val">--</span><span
+                class="sensor-unit">m</span></div>
+            <div class="sensor-row"><span>Max Range</span><span id="lidar-max" class="sensor-val">--</span><span
+                class="sensor-unit">m</span></div>
+            <div class="sensor-row"><span>Points</span><span id="lidar-pts" class="sensor-val">--</span><span
+                class="sensor-unit">pts</span></div>
+          </div>
+        </div>
+
+        <!-- Cmd/Vel Panel -->
+        <div class="sensor-card" id="cmdvel-card">
+          <h3>🎮 Command Velocity</h3>
+          <div id="joystick-display">
+            <canvas id="joystick-canvas" width="200" height="200"></canvas>
+          </div>
+          <div class="sensor-rows">
+            <div class="sensor-row"><span>Linear X</span><span id="cv-lx" class="sensor-val">0.000</span><span
+                class="sensor-unit">m/s</span></div>
+            <div class="sensor-row"><span>Linear Y</span><span id="cv-ly" class="sensor-val">0.000</span><span
+                class="sensor-unit">m/s</span></div>
+            <div class="sensor-row"><span>Angular Z</span><span id="cv-az" class="sensor-val">0.000</span><span
+                class="sensor-unit">rad/s</span></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── NAVIGATION ── -->
+    <section id="navigation">
+      <div class="section-header">
+        <div class="section-badge">NAVIGATION</div>
+        <h2>Autonomous Navigation</h2>
+        <p>Cartographer SLAM map and robot pose estimation</p>
+      </div>
+      <div id="nav-grid">
+        <div id="map-card" class="sensor-card wide">
+          <h3>🗺 SLAM Map (Simulated)</h3>
+          <canvas id="map-canvas" width="700" height="340"></canvas>
+          <div id="map-legend">
+            <span class="legend-item"><span class="legend-dot robot"></span>Robot</span>
+            <span class="legend-item"><span class="legend-dot obstacle"></span>Obstacle</span>
+            <span class="legend-item"><span class="legend-dot explored"></span>Explored</span>
+            <span class="legend-item"><span class="legend-dot unknown"></span>Unknown</span>
+          </div>
+        </div>
+        <div id="pose-card" class="sensor-card">
+          <h3>📐 Robot Pose</h3>
+          <div class="sensor-rows">
+            <div class="sensor-row"><span>X Position</span><span id="pose-x" class="sensor-val">--</span><span
+                class="sensor-unit">m</span></div>
+            <div class="sensor-row"><span>Y Position</span><span id="pose-y" class="sensor-val">--</span><span
+                class="sensor-unit">m</span></div>
+            <div class="sensor-row"><span>Z Position</span><span id="pose-z" class="sensor-val">--</span><span
+                class="sensor-unit">m</span></div>
+            <div class="sensor-row"><span>Heading</span><span id="pose-h" class="sensor-val">--</span><span
+                class="sensor-unit">°</span></div>
+          </div>
+          <div id="compass-wrap">
+            <canvas id="compass-canvas" width="160" height="160"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SYSTEMS ── -->
+    <section id="systems">
+      <div class="section-header">
+        <div class="section-badge">ROS2 NODES</div>
+        <h2>System Status</h2>
+        <p>Active ROS2 nodes and launch configurations</p>
+      </div>
+      <div id="systems-grid">
+        <div class="node-card active">
+          <div class="node-dot"></div>
+          <div class="node-info"><strong>robot_state_publisher</strong><span>bharatbot_description · URDF</span></div>
+          <div class="node-badge online">ONLINE</div>
+        </div>
+        <div class="node-card active">
+          <div class="node-dot"></div>
+          <div class="node-info"><strong>bharatbot_hardware_interface</strong><span>/cmd_vel · /scan · /imu</span></div>
+          <div class="node-badge online">ONLINE</div>
+        </div>
+        <div class="node-card active">
+          <div class="node-dot"></div>
+          <div class="node-info"><strong>gazebo_server</strong><span>habitat_classic.world · ODE physics</span></div>
+          <div class="node-badge sim">SIM</div>
+        </div>
+        <div class="node-card active">
+          <div class="node-dot"></div>
+          <div class="node-info"><strong>gazebo_client</strong><span>GUI renderer · xcb platform</span></div>
+          <div class="node-badge sim">SIM</div>
+        </div>
+        <div class="node-card active">
+          <div class="node-dot"></div>
+          <div class="node-info"><strong>cartographer_slam</strong><span>2D map · /scan subscriber</span></div>
+          <div class="node-badge online">ONLINE</div>
+        </div>
+        <div class="node-card inactive">
+          <div class="node-dot"></div>
+          <div class="node-info"><strong>bharatbot_navigation</strong><span>Nav2 stack · path planner</span></div>
+          <div class="node-badge idle">IDLE</div>
+        </div>
+        <div class="node-card inactive">
+          <div class="node-dot"></div>
+          <div class="node-info"><strong>bharatbot_environment</strong><span>environment_monitor node</span></div>
+          <div class="node-badge idle">IDLE</div>
+        </div>
+        <div class="node-card inactive">
+          <div class="node-dot"></div>
+          <div class="node-info"><strong>bharatbot_patrol</strong><span>patrol_manager · waypoints</span></div>
+          <div class="node-badge idle">IDLE</div>
+        </div>
+        <div class="node-card active">
+          <div class="node-dot"></div>
+          <div class="node-info"><strong>rviz2</strong><span>bharatbot.rviz · visualization</span></div>
+          <div class="node-badge online">ONLINE</div>
+        </div>
+      </div>
+
+      <!-- Launch Cards -->
+      <div id="launch-configs">
+        <h3 id="launch-heading">Available Launch Files</h3>
+        <div id="launch-grid">
+          <div class="launch-card">
+            <div class="lc-name">habitat_world.launch.py</div>
+            <div class="lc-desc">Spawn habitat surface in Gazebo with low gravity</div>
+            <div class="lc-cmd">ros2 launch bharatbot_bringup habitat_world.launch.py</div>
+          </div>
+          <div class="launch-card">
+            <div class="lc-name">bharatbot_habitat.launch.py</div>
+            <div class="lc-desc">Full robot + Gazebo + RViz with habitat world</div>
+            <div class="lc-cmd">ros2 launch bharatbot_bringup bharatbot_habitat.launch.py</div>
+          </div>
+          <div class="launch-card">
+            <div class="lc-name">cartographer.launch.py</div>
+            <div class="lc-desc">Cartographer SLAM mapping node</div>
+            <div class="lc-cmd">ros2 launch bharatbot_bringup cartographer.launch.py</div>
+          </div>
+          <div class="launch-card">
+            <div class="lc-name">bharatbot_complete.launch.py</div>
+            <div class="lc-desc">Complete system with navigation stack</div>
+            <div class="lc-cmd">ros2 launch bharatbot_bringup bharatbot_complete.launch.py</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="footer">
+      <div id="footer-logo">BharatBot</div>
+      <p>BharatBot - Autonomous Servicing robot for lunar and martian habitats · ROS2 · Gazebo · Cartographer SLAM</p>
+      <p id="footer-copy">© 2026 BharatBot · All rights reserved</p>
+    </footer>
+
+  </div><!-- end #dashboard -->
+
+  <script src="ros_bridge.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
