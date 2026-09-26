@@ -1,4 +1,4 @@
-# BharatBot Autonomous Navigation Robot
+# BharatBot - Indigenous Modular Autonomous Servicing Robot for Lunar and Martian Habitats
 
 <p align="center">
   <img src="media/gazebo.png" alt="BharatBot in Gazebo" width="45%">
